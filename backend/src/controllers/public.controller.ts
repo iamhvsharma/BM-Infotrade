@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { FormService } from '@/services/form.service';
 import { ApiResponse } from '@/types';
+import { getPublicForm } from '@/services/form.service';
+import { submitFormResponse } from '@/services/form.service';
 
 export class PublicController {
   /**
@@ -9,7 +10,7 @@ export class PublicController {
   static async getForm(req: Request, res: Response<ApiResponse>): Promise<void> {
     try {
       const { formId } = req.params;
-      const form = await FormService.getPublicForm(formId);
+      const form = await getPublicForm(formId);
 
       res.status(200).json({
         success: true,
@@ -31,7 +32,7 @@ export class PublicController {
       // Get client IP address
       const clientIP = ipAddress || req.ip || req.connection.remoteAddress || 'unknown';
 
-      await FormService.submitFormResponse(formId, {
+      await submitFormResponse(formId, {
         data,
         userAgent,
         ipAddress: clientIP,

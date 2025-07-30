@@ -1,5 +1,15 @@
 import { Router } from "express";
-import { FormController } from "@/controllers/form.controller";
+import {
+  createFormController,
+  getFormsController,
+  getFormController,
+  updateFormController,
+  deleteFormController,
+  duplicateFormController,
+  getFormResponsesController,
+  getFormStatisticsController,
+  exportResponsesController,
+} from "@/controllers/form.controller";
 import {
   validateBody,
   validateQuery,
@@ -23,33 +33,38 @@ const router: Router = Router();
 router.use(authenticateToken, requireUser);
 
 // Form CRUD operations
-router.post("/", validateBody(createFormSchema), FormController.createForm);
+router.post("/", validateBody(createFormSchema), createFormController);
+
 router.get(
   "/",
   validateQuery(paginationSchema),
   validateQuery(formSearchSchema),
-  FormController.getForms
+  getFormsController
 );
+
 router.get(
   "/:formId",
   validateParams(z.object({ formId: z.string() })),
-  FormController.getForm
+  getFormController
 );
+
 router.put(
   "/:formId",
   validateParams(z.object({ formId: z.string() })),
   validateBody(updateFormSchema),
-  FormController.updateForm
+  updateFormController
 );
+
 router.delete(
   "/:formId",
   validateParams(z.object({ formId: z.string() })),
-  FormController.deleteForm
+  deleteFormController
 );
+
 router.post(
   "/:formId/duplicate",
   validateParams(z.object({ formId: z.string() })),
-  FormController.duplicateForm
+  duplicateFormController
 );
 
 // Form responses
@@ -58,14 +73,14 @@ router.get(
   validateParams(z.object({ formId: z.string() })),
   validateQuery(paginationSchema),
   validateQuery(formResponseSearchSchema),
-  FormController.getFormResponses
+  getFormResponsesController
 );
 
 // Form statistics
 router.get(
   "/:formId/statistics",
   validateParams(z.object({ formId: z.string() })),
-  FormController.getFormStatistics
+  getFormStatisticsController
 );
 
 // Export responses
@@ -73,7 +88,7 @@ router.post(
   "/:formId/export",
   validateParams(z.object({ formId: z.string() })),
   validateBody(exportOptionsSchema),
-  FormController.exportResponses
+  exportResponsesController
 );
 
 export default router;
