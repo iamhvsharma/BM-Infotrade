@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  forms     Form[]
+  responses FormResponse[]
+
+  @@map("users")
+}
+
+model Form {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  submitButtonText  String   @default("Submit")
+  successMessage    String   @default("Thank you for your submission!")
+  isPublished       Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  theme             Json     // Store theme configuration as JSON
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Foreign Keys
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  fields    FormField[]
+  responses FormResponse[]
+
+  @@map("forms")
+}
+
+model FormField {
+  id          String   @id @default(cuid())
+  type        FieldType
+  label       String
+  placeholder String?
+  required    Boolean  @default(false)
+  options     String[] // For select, radio, checkbox fields
+  order       Int
+  section     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign Keys
+  formId String
+  form   Form @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@map("form_fields")
+}
+
+model FormResponse {
+  id          String   @id @default(cuid())
+  data        Json     // Store response data as JSON
+  submittedAt DateTime @default(now())
+  userAgent   String?
+  ipAddress   String?
+
+  // Foreign Keys
+  formId String
+  form   Form @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  // Optional user relation for authenticated responses
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("form_responses")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum FieldType {
+  TEXT
+  TEXTAREA
+  RADIO
+  CHECKBOX
+  SELECT
+  MULTISELECT
+  DATE
+  EMAIL
+  NUMBER
+  PHONE
+  URL
+  FILE
+} 
