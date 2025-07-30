@@ -3,8 +3,7 @@ import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "@/types";
 import { ApiResponse } from "@/types";
 import prisma from "@/config/database";
-import { JWT_SECRET, JWT_EXPIRES_IN } from "@/config/envConfig";
-
+import { JWT_SECRET } from "@/config/envConfig";
 
 export interface JWTPayload {
   userId: string;
