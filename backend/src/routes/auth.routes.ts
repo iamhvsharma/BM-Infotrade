@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AuthController } from "@/controllers/auth.controller";
+import { signupController, loginController, logoutController, getProfileController, updateProfileController, changePasswordController } from "@/controllers/auth.controller";
 import { validateBody } from "@/middleware/validation.middleware";
 import {
   loginSchema,
@@ -11,18 +11,18 @@ import { authenticateToken } from "@/middleware/auth.middleware";
 const router: Router = Router();
 
 // Public routes
-router.post("/signup", validateBody(signupSchema), AuthController.signup);
-router.post("/login", validateBody(loginSchema), AuthController.login);
+router.post("/signup", validateBody(signupSchema), signupController);
+router.post("/login", validateBody(loginSchema), loginController);
 
 // Protected routes
-router.post("/logout", authenticateToken, AuthController.logout);
-router.get("/profile", authenticateToken, AuthController.getProfile);
-router.put("/profile", authenticateToken, AuthController.updateProfile);
+router.post("/logout", authenticateToken, logoutController);
+router.get("/profile", authenticateToken, getProfileController);
+router.put("/profile", authenticateToken, updateProfileController);
 router.put(
   "/change-password",
   authenticateToken,
   validateBody(changePasswordSchema),
-  AuthController.changePassword
+  changePasswordController
 );
 
 export default router;

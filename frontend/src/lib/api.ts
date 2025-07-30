@@ -10,6 +10,25 @@ interface ApiResponse<T = any> {
   message?: string;
 }
 
+// Authentication response types
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface LoginResponse {
+  token: string;
+  user: User;
+}
+
+interface SignupResponse {
+  token: string;
+  user: User;
+}
+
 class ApiClient {
   private baseURL: string;
 
@@ -54,7 +73,10 @@ class ApiClient {
   }
 
   // Authentication
-  async login(credentials: { email: string; password: string }) {
+  async login(credentials: {
+    email: string;
+    password: string;
+  }): Promise<ApiResponse<LoginResponse>> {
     return this.request("/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
@@ -66,7 +88,7 @@ class ApiClient {
     email: string;
     password: string;
     confirmPassword: string;
-  }) {
+  }): Promise<ApiResponse<SignupResponse>> {
     return this.request("/auth/signup", {
       method: "POST",
       body: JSON.stringify(userData),
@@ -139,15 +161,18 @@ export const apiClient = new ApiClient(API_BASE_URL);
 // Helper functions for common operations
 export const api = {
   // Authentication
-  login: (credentials: { email: string; password: string }) =>
-    apiClient.login(credentials),
+  login: (credentials: {
+    email: string;
+    password: string;
+  }): Promise<ApiResponse<LoginResponse>> => apiClient.login(credentials),
 
   signup: (userData: {
     name: string;
     email: string;
     password: string;
     confirmPassword: string;
-  }) => apiClient.signup(userData),
+    role: string;
+  }): Promise<ApiResponse<SignupResponse>> => apiClient.signup(userData),
 
   logout: () => apiClient.logout(),
 

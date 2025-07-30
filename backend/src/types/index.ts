@@ -106,6 +106,7 @@ export interface SignupInput {
   email: string;
   password: string;
   confirmPassword: string;
+role: "USER" | "ADMIN";
 }
 
 export interface CreateFormInput {

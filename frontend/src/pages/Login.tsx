@@ -13,6 +13,12 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { User } from "@/types/index";
+
+
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -22,6 +28,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login: setAuth } = useAuth();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,27 +37,24 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // });
+      const response = await api.login({ email, password });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (response.success && response.data) {
+        toast({
+          title: "Login successful!",
+          description: "Welcome back to FormCraft.",
+        });
 
-      // For now, just simulate successful login
-      toast({
-        title: "Login successful!",
-        description: "Welcome back to FormCraft.",
-      });
+        // Store auth token and user data
+        localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        setAuth(response.data.token, response.data.user as any); // ✅ updates context
 
-      // Store auth token (replace with actual token from API)
-      localStorage.setItem("authToken", "dummy-token");
-      localStorage.setItem("user", JSON.stringify({ email, role: "admin" }));
 
-      navigate("/admin/dashboard");
+        navigate("/admin/dashboard");
+      } else {
+        setError(response.error || "Invalid email or password. Please try again.");
+      }
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {
